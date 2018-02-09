@@ -119,7 +119,11 @@
 #define VKI_XEN_DOMCTL_cacheflush                    71
 #define VKI_XEN_DOMCTL_get_vcpu_msrs                 72
 #define VKI_XEN_DOMCTL_set_vcpu_msrs                 73
+#define VKI_XEN_DOMCTL_setvnumainfo                  74
+#define VKI_XEN_DOMCTL_psr_cmt_op                    75
 #define VKI_XEN_DOMCTL_monitor_op                    77 /* new in 4.6 */
+#define VKI_XEN_DOMCTL_psr_cat_op                    78
+#define VKI_XEN_DOMCTL_soft_reset                    79
 #define VKI_XEN_DOMCTL_gdbsx_guestmemio            1000
 #define VKI_XEN_DOMCTL_gdbsx_pausevcpu             1001
 #define VKI_XEN_DOMCTL_gdbsx_unpausevcpu           1002
@@ -191,6 +195,9 @@ typedef struct vki_xen_domctl_getdomaininfo_00000009 vki_xen_domctl_getdomaininf
 DEFINE_VKI_XEN_GUEST_HANDLE(vki_xen_domctl_getdomaininfo_00000009_t);
 
 /* vki_xen_domctl_getdomaininfo_0000000a is the same as 00000009 */
+/* vki_xen_domctl_getdomaininfo_0000000b is the same as 00000009 */
+/* vki_xen_domctl_getdomaininfo_0000000c is the same as 00000009 */
+/* vki_xen_domctl_getdomaininfo_0000000d is the same as 00000009 */
 
 /* Get/set the NUMA node(s) with which the guest has affinity with. */
 /* XEN_DOMCTL_setnodeaffinity */
@@ -550,6 +557,10 @@ struct vki_xen_domctl_monitor_op_0000000b {
             /* Pause vCPU until response */
             vki_uint8_t sync;
         } guest_request;
+
+        struct {
+            vki_uint8_t sync;
+        } debug_exception;
     } u;
 };
 
@@ -573,6 +584,9 @@ struct vki_xen_domctl_monitor_op {
         struct {
             vki_uint8_t sync;
         } guest_request;
+        struct {
+            vki_uint8_t sync;
+        } debug_exception;
     } u;
 };
 

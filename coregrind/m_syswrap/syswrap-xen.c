@@ -532,6 +532,7 @@ PRE(xen_version)
    case VKI_XENVER_pagesize:
    case VKI_XENVER_guest_handle:
    case VKI_XENVER_commandline:
+   case VKI_XENVER_build_id:
       /* No inputs */
       break;
 
@@ -584,6 +585,8 @@ PRE(sysctl) {
    case 0x00000009:
    case 0x0000000a:
    case 0x0000000b:
+   case 0x0000000c:
+   case 0x0000000d:
 	   break;
    default:
       bad_intf_version(tid, layout, arrghs, status, flags,
@@ -626,6 +629,8 @@ PRE(sysctl) {
 	 break;
       case 0x0000000a:
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
 	 PRE_XEN_SYSCTL_READ(getdomaininfolist_0000000a, first_domain);
 	 PRE_XEN_SYSCTL_READ(getdomaininfolist_0000000a, max_domains);
 	 PRE_XEN_SYSCTL_READ(getdomaininfolist_0000000a, buffer);
@@ -730,6 +735,7 @@ PRE(domctl)
    case 0x0000000a:
    case 0x0000000b:
    case 0x0000000c:
+   case 0x0000000d:
 	   break;
    default:
       bad_intf_version(tid, layout, arrghs, status, flags,
@@ -822,6 +828,8 @@ PRE(domctl)
          __PRE_XEN_DOMCTL_READ(test_assign_device, assign_device_00000007, machine_sbdf);
          break;
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          __PRE_XEN_DOMCTL_READ(test_assign_device, assign_device_0000000b, dev);
          __PRE_XEN_DOMCTL_READ(test_assign_device, assign_device_0000000b, flag);
          switch (domctl->u.assign_device_0000000b.dev) {
@@ -852,6 +860,8 @@ PRE(domctl)
          __PRE_XEN_DOMCTL_READ(assign_device, assign_device_00000007, machine_sbdf);
          break;
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          __PRE_XEN_DOMCTL_READ(assign_device, assign_device_0000000b, dev);
          __PRE_XEN_DOMCTL_READ(assign_device, assign_device_0000000b, flag);
          switch (domctl->u.assign_device_0000000b.dev) {
@@ -882,6 +892,8 @@ PRE(domctl)
          __PRE_XEN_DOMCTL_READ(deassign_device, assign_device_00000007, machine_sbdf);
          break;
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          __PRE_XEN_DOMCTL_READ(deassign_device, assign_device_0000000b, dev);
          __PRE_XEN_DOMCTL_READ(deassign_device, assign_device_0000000b, flag);
          switch (domctl->u.assign_device_0000000b.dev) {
@@ -916,6 +928,8 @@ PRE(domctl)
          __PRE_XEN_DOMCTL_READ(settscinfo, tsc_info_00000007, info.elapsed_nsec);
          break;
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          __PRE_XEN_DOMCTL_READ(settscinfo, tsc_info_0000000b, tsc_mode);
          __PRE_XEN_DOMCTL_READ(settscinfo, tsc_info_0000000b, gtsc_khz);
          __PRE_XEN_DOMCTL_READ(settscinfo, tsc_info_0000000b, incarnation);
@@ -1248,6 +1262,8 @@ PRE(domctl)
          __PRE_XEN_DOMCTL_READ(mem_event_op, mem_event_op_00000007, mode);
          break;
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          __PRE_XEN_DOMCTL_READ(vm_event_op, vm_event_op_0000000b, op);
          __PRE_XEN_DOMCTL_READ(vm_event_op, vm_event_op_0000000b, mode);
          break;
@@ -1277,7 +1293,9 @@ PRE(domctl)
 
    case VKI_XEN_DOMCTL_monitor_op:
       switch (domctl->interface_version) {
-      case 0x000000b:
+      case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
           if (domctl->u.monitor_op_0000000b.op == VKI_XEN_DOMCTL_MONITOR_OP_ENABLE ||
               domctl->u.monitor_op_0000000b.op == VKI_XEN_DOMCTL_MONITOR_OP_ENABLE) {
              switch (domctl->u.monitor_op_0000000b.event) {
@@ -1400,6 +1418,41 @@ PRE(hvm_op)
       PRE_XEN_HVMOP_READ(inject_trap, insn_len);
       PRE_XEN_HVMOP_READ(inject_trap, cr2);
       break;
+
+   case VKI_XEN_HVMOP_altp2m: {
+      vki_xen_hvm_altp2m_t *Arg =
+         (vki_xen_hvm_altp2m_t*)ARG2;
+      PRE_XEN_HVMOP_READ(altp2m, version);
+      PRE_XEN_HVMOP_READ(altp2m, cmd);
+      PRE_XEN_HVMOP_READ(altp2m, domain);
+
+      switch ( Arg->cmd ) {
+      case VKI_XEN_HVMOP_altp2m_get_domain_state:
+      case VKI_XEN_HVMOP_altp2m_set_domain_state:
+         PRE_XEN_HVMOP_READ(altp2m, u.domain_state.state);
+         break;
+      case VKI_XEN_HVMOP_altp2m_vcpu_enable_notify:
+         PRE_XEN_HVMOP_READ(altp2m, u.enable_notify.vcpu_id);
+         PRE_XEN_HVMOP_READ(altp2m, u.enable_notify.gfn);
+         break;
+      case VKI_XEN_HVMOP_altp2m_create_p2m:
+      case VKI_XEN_HVMOP_altp2m_destroy_p2m:
+      case VKI_XEN_HVMOP_altp2m_switch_p2m:
+         PRE_XEN_HVMOP_READ(altp2m, u.view.view);
+         break;
+      case VKI_XEN_HVMOP_altp2m_set_mem_access:
+         PRE_XEN_HVMOP_READ(altp2m, u.set_mem_access.view);
+         PRE_XEN_HVMOP_READ(altp2m, u.set_mem_access.hvmmem_access);
+         PRE_XEN_HVMOP_READ(altp2m, u.set_mem_access.gfn);
+         break;
+      case VKI_XEN_HVMOP_altp2m_change_gfn:
+         PRE_XEN_HVMOP_READ(altp2m, u.change_gfn.view);
+         PRE_XEN_HVMOP_READ(altp2m, u.change_gfn.old_gfn);
+         PRE_XEN_HVMOP_READ(altp2m, u.change_gfn.new_gfn);
+         break;
+      };
+     break;
+   }
 
    default:
       bad_subop(tid, layout, arrghs, status, flags,
@@ -1672,6 +1725,8 @@ POST(sysctl)
    case 0x00000009:
    case 0x0000000a:
    case 0x0000000b:
+   case 0x0000000c:
+   case 0x0000000d:
 	   break;
    default:
       return;
@@ -1706,6 +1761,8 @@ POST(sysctl)
 	 break;
       case 0x0000000a:
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
 	 POST_XEN_SYSCTL_WRITE(getdomaininfolist_0000000a, num_domains);
 	 POST_MEM_WRITE((Addr)sysctl->u.getdomaininfolist_0000000a.buffer.p,
 			sizeof(*sysctl->u.getdomaininfolist_0000000a.buffer.p)
@@ -1751,6 +1808,8 @@ POST(sysctl)
          break;
       case 0x0000000a:
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          POST_XEN_SYSCTL_WRITE(physinfo_0000000a, threads_per_core);
          POST_XEN_SYSCTL_WRITE(physinfo_0000000a, cores_per_socket);
          POST_XEN_SYSCTL_WRITE(physinfo_0000000a, nr_cpus);
@@ -1808,6 +1867,8 @@ POST(domctl){
    case 0x00000009:
    case 0x0000000a:
    case 0x0000000b:
+   case 0x0000000c:
+   case 0x0000000d:
 	   break;
    default:
 	   return;
@@ -1869,6 +1930,8 @@ POST(domctl){
                         sizeof(vki_xen_guest_tsc_info_t));
          break;
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          __POST_XEN_DOMCTL_WRITE(gettscinfo, tsc_info_0000000b, tsc_mode);
          __POST_XEN_DOMCTL_WRITE(gettscinfo, tsc_info_0000000b, gtsc_khz);
          __POST_XEN_DOMCTL_WRITE(gettscinfo, tsc_info_0000000b, incarnation);
@@ -2120,6 +2183,8 @@ POST(domctl){
          __POST_XEN_DOMCTL_WRITE(mem_event_op, mem_event_op_00000007, port);
          break;
       case 0x0000000b:
+      case 0x0000000c:
+      case 0x0000000d:
          __POST_XEN_DOMCTL_WRITE(vm_event_op, vm_event_op_0000000b, port);
          break;
       }

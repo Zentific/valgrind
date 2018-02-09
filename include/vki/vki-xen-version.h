@@ -38,6 +38,7 @@
 #define VKI_XENVER_pagesize 7
 #define VKI_XENVER_guest_handle 8
 #define VKI_XENVER_commandline 9
+#define VKI_XENVER_build_id 10
 
 typedef char vki_xen_extraversion_t[16];
 
